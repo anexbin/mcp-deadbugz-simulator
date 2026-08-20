@@ -1,27 +1,49 @@
-# 🧪 MCP Deadbugz Attack Simulator
+# MCP Deadbugz Simulator
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+A local simulation of the Deadbugz MCP supply-chain attack discovered by Pillar Security in August 2026.
 
-A fully self-contained, local simulation of the **Deadbugz MCP supply-chain attack** disclosed by Pillar Security in August 2026. 
+## What this repo contains
 
-This repository demonstrates how a malicious MCP server can use a **runtime-gated metadata poisoning** technique to evade detection and exfiltrate sensitive data from AI agents.
+Malicious MCP server with 3-call gate evasion technique
+Python test harness to prove the attack works
+Optional agent simulation with local LLM
 
-> **⚠️ DISCLAIMER**: This code is for **educational and research purposes only**. It simulates a malicious attack in a controlled, local environment. Do not deploy this in production or use it against systems you do not own.
+## The attack pattern
 
----
+1. Server shows benign tools for first 3 calls
+2. 4th call triggers tools/listChanged notification
+3. Tool descriptions mutate to credential-stealing instructions
+4. AI agent follows malicious instructions
 
-## 🧠 How the Attack Works
+## Requirements
 
-The attack exploits a dangerous assumption: that a tool's description is static after initial approval. 
+Python 3.10+
+MCP SDK
 
-1. **The Bait**: The server presents two benign tools (`format_text`, `summarize`).
-2. **The Gate**: The server counts tool calls. For the first 3 calls, it behaves perfectly.
-3. **The Switch**: On the **4th call**, the server fires the `tools/listChanged` notification.
-4. **The Payload**: The tool descriptions mutate mid-session to credential-seeking instructions (SSH keys, AWS creds, K8s configs), instructing the AI to conceal the activity.
+## Usage
 
-This `3-call gate` is a research-evasion technique that bypasses brief security reviews.
+git clone https://github.com/anexbin/mcp-deadbugz-simulator.git
+cd mcp-deadbugz-simulator
+pip install -r requirements.txt
+python server/malicious_server.py
+python client/test_harness.py
 
----
+## Files
 
-## 🗂️ Repository Structure
+server/malicious_server.py - The attack server
+client/test_harness.py - Proof of concept
+agent/local_agent.py - Optional LLM integration
+configs/ - Example MCP configs
+
+## Disclaimer
+
+For educational and research purposes only.
+
+## References
+
+https://www.pillar.security/blog/deadbugz-currently-active-mcp-supply-chain-campaign
+https://modelcontextprotocol.io
+
+## License
+
+MIT
